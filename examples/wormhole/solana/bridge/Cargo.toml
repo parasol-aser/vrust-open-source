@@ -1,0 +1,6 @@
+[workspace]
+members = ["program", "client", "program_stub", "cpi_poster"]
+exclude = ["memmap2-rs"]
+
+[patch.crates-io]
+memmap2 = { path = "memmap2-rs" }

@@ -1,0 +1,60 @@
+name: Docs Pull Request
+
+on:
+  pull_request:
+    paths:
+    - 'docs/**'
+    - '.github/workflows/pull-request-docs.yml'
+  push:
+    branches: [master]
+    paths:
+    - 'docs/**'
+    - '.github/workflows/pull-request-docs.yml'
+
+jobs:
+  all_github_action_checks:
+    runs-on: ubuntu-latest
+    if: needs.check_non_docs.outputs.run_all_github_action_checks == 'true'
+    needs:
+      - check_non_docs
+      - build_docs
+    steps:
+      - run: echo "Done"
+
+  check_non_docs:
+    outputs:
+      run_all_github_action_checks: ${{ steps.check_files.outputs.run_all_github_action_checks }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: check modified files
+        id: check_files
+        run: |
+          echo "========== check paths of modified files =========="
+          echo "run_all_github_action_checks=true" >> $GITHUB_OUTPUT
+          git diff --name-only HEAD^ HEAD > files.txt
+          while IFS= read -r file
+          do
+            if [[ $file != docs/** ]]; then
+              echo "Found modified non-'docs' file(s)"
+              echo "run_all_github_action_checks=false" >> $GITHUB_OUTPUT
+              break
+            fi
+          done < files.txt
+
+  build_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: "Build Docs"
+        run: |
+         cd docs/
+         npm ci
+         ./build.sh

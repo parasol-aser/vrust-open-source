@@ -1,0 +1,156 @@
+name: Program
+
+on:
+  push:
+    branches: [master, exchange_rate_override]
+  pull_request:
+    branches: [master, exchange_rate_override]
+
+env:
+  CARGO_TERM_COLOR: always
+  SOLANA_VERSION: "1.9.12"
+  RUST_TOOLCHAIN: "1.59.0"
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Install Cachix
+      - uses: cachix/install-nix-action@v17
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v10
+        with:
+          name: saber
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      # Install Rust
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          profile: minimal
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+
+      # Install Solana
+      - name: Cache Solana binaries
+        id: solana-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/solana
+            ~/.local/share/solana/install
+          key: ${{ runner.os }}-${{ env.SOLANA_VERSION }}
+      - name: Install Solana
+        if: steps.solana-cache.outputs.cache-hit != 'true'
+        run: |
+          nix shell .#ci --command solana-install init ${{ env.SOLANA_VERSION }}
+      - name: Setup Solana Path
+        run: |
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+          export PATH="/home/runner/.local/share/solana/install/active_release/bin:$PATH"
+          solana --version
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v1
+        with:
+          key: ${{ runner.os }}-${{ env.SOLANA_VERSION }}
+
+      - name: Run unit tests
+        working-directory: stable-swap-program
+        run: ./do.sh test --nocapture
+
+  e2e-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+
+      - name: Cache SDK dependencies
+        uses: actions/cache@v3
+        id: cache-sdk
+        with:
+          path: ./sdk/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      # Install Cachix
+      - uses: cachix/install-nix-action@v17
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v10
+        with:
+          name: saber
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      # Install Solana
+      - name: Cache Solana binaries
+        id: solana-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/solana
+            ~/.local/share/solana/install
+          key: ${{ runner.os }}-${{ env.SOLANA_VERSION }}
+      - name: Install Solana
+        if: steps.solana-cache.outputs.cache-hit != 'true'
+        run: |
+          nix shell .#ci --command solana-install init ${{ env.SOLANA_VERSION }}
+      - name: Setup Solana Path
+        run: |
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+          export PATH="/home/runner/.local/share/solana/install/active_release/bin:$PATH"
+          solana --version
+
+      # Install Rust
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          profile: minimal
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v1
+        with:
+          key: ${{ runner.os }}-${{ env.SOLANA_VERSION }}
+
+      - name: Build
+        run: nix shell .#ci --command anchor build --program-name stable_swap
+      - name: Run e2e tests
+        working-directory: stable-swap-program
+        run: nix shell ../#ci --command ./do.sh e2e-test
+
+  ## FIXME(michael): ERROR: no interesting inputs were found. Is the code instrumented for coverage? Exiting.
+  ## fuzz:
+  ##   runs-on: ubuntu-latest
+
+  ##   steps:
+  ##     - uses: actions/checkout@v3
+  ##     # Install Rust
+  ##     - name: Install Rust
+  ##       uses: actions-rs/toolchain@v1
+  ##       with:
+  ##         override: true
+  ##         profile: minimal
+  ##         toolchain: nightly-2022-02-01
+  ##     - name: Cache dependencies
+  ##       uses: Swatinem/rust-cache@v1
+
+  ##     # Install Cachix
+  ##     - uses: cachix/install-nix-action@v17
+  ##     - name: Setup Cachix
+  ##       uses: cachix/cachix-action@v10
+  ##       with:
+  ##         name: saber
+  ##         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+  ##     - name: Build
+  ##       run: nix shell .#ci --command cargo fuzz build --dev fuzz_test
+  ##       env:
+  ##         RUSTFLAGS: "-Znew-llvm-pass-manager=no"
+  ##     - name: Run fuzz test
+  ##       run: nix shell .#ci --command cargo fuzz run --dev fuzz_test -- -max_total_time=180
+  ##       env:
+  ##         RUSTFLAGS: "-Znew-llvm-pass-manager=no"

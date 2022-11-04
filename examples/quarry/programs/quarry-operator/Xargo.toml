@@ -1,0 +1,11 @@
+[dependencies.std]
+features = []
+
+[target.bpfel-unknown-unknown.dependencies.std]
+features = []
+
+[target.x86_64-unknown-linux-gnu.dependencies.term]
+stage = 1
+
+[target.x86_64-unknown-linux-gnu.dependencies.proc_macro]
+stage = 2

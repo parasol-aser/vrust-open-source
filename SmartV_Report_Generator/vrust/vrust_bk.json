@@ -1,0 +1,21 @@
+{
+   "errors" : [
+      {
+         "Alleviation" : "We will inform the developer/development team about this issue.",
+         "Category" : "Security Issue",
+         "Description" : "Unrestricted Action. Malicious users may modify owner-only address: s_keccak256([s_x1:0x0]) with path condition: sload(s_keccak256([s_caller:0x1])) && iszero(((s_calldatasize)-(0x4))<(0x20)) && (0xCB5A28FA==s_x0) && !(0xA6F9DAE1==s_x0) && !(0x65B8E524==s_x0) && !(0x41C0E1B5==s_x0) && !(s_calldatasize)<(0x4) && iszero(s_callvalue)",
+         "ID" : "victim-1",
+         "Location" : "victim.sol:17\n\nadmins[adm] = true",
+         "Recommendation" : "We advise that this security issue should be addressed and conduct an evaluation afterwards.",
+         "Severity" : "Critical",
+         "Stack" : "-> function referAdmin(address adm) public onlyUsers // @victim.sol::line16 \n\t require(users[msg.sender]); // @victim.sol::line9\nReach the vulnerability.\n",
+         "Status" : "Unresolved",
+         "Title" : "Unrestricted Action"
+      }
+   ],
+   "file" : "victim.sol",
+   "id" : "victim",
+   "local-loc" : "/home/bozhen/remote-xs/_local/my/victim.sol",
+   "time" : "Thu Nov  4 15:20:18 2021"
+}
+

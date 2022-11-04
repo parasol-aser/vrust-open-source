@@ -1,0 +1,12 @@
+build
+node_modules
+.idea
+.arcconfig
+*.iml
+bin
+target
+/mutagen.sh
+venv
+.env
+bigtable-admin.json
+bigtable-writer.json

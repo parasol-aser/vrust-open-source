@@ -1,0 +1,37 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "mpl_token_vault",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1644426953",
+  "errors": [
+    {
+      "type": "TypeConfusion",
+      "id": "TYP_CVE_0",
+      "title": "is_signer",
+      "category": "Type Confusion Vulnerability",
+      "severity": "Critical",
+      "location": "<instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize",
+      "code": "token-vault/program/src/instruction.rs:19:1: 21:2 \n\tpub struct AmountArgs {\n    pub amount: u64,\n}\ntoken-vault/program/src/instruction.rs:25:1: 27:2 \n\tpub struct NumberOfShareArgs {\n    pub number_of_shares: u64,\n}\ntoken-vault/program/src/instruction.rs:31:1: 33:2 \n\tpub struct MintEditionProxyArgs {\n    pub edition: u64,\n}",
+      "callstack": "",
+      "status": "UnResolved",
+      "description": "Function <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize is vulnerable to type confusion attacks: [StructDefLayout { struct_def: instruction::AmountArgs, layout: [u64], span: token-vault/program/src/instruction.rs:19:1: 21:2 (#0) }, StructDefLayout { struct_def: instruction::NumberOfShareArgs, layout: [u64], span: token-vault/program/src/instruction.rs:25:1: 27:2 (#0) }, StructDefLayout { struct_def: instruction::MintEditionProxyArgs, layout: [u64], span: token-vault/program/src/instruction.rs:31:1: 33:2 (#0) }]!",
+      "link": "GitHub Link to be added.",
+      "alleviation": "Some alleviation steps here."
+    },
+    {
+      "type": "TypeConfusion",
+      "id": "TYP_CVE_1",
+      "title": "is_signer",
+      "category": "Type Confusion Vulnerability",
+      "severity": "Critical",
+      "location": "<instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize",
+      "code": "token-vault/program/src/instruction.rs:25:1: 27:2 \n\tpub struct NumberOfShareArgs {\n    pub number_of_shares: u64,\n}\ntoken-vault/program/src/instruction.rs:31:1: 33:2 \n\tpub struct MintEditionProxyArgs {\n    pub edition: u64,\n}",
+      "callstack": "",
+      "status": "UnResolved",
+      "description": "Function <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize, <instruction::VaultInstruction as borsh::BorshDeserialize>::deserialize is vulnerable to type confusion attacks: [StructDefLayout { struct_def: instruction::NumberOfShareArgs, layout: [u64], span: token-vault/program/src/instruction.rs:25:1: 27:2 (#0) }, StructDefLayout { struct_def: instruction::MintEditionProxyArgs, layout: [u64], span: token-vault/program/src/instruction.rs:31:1: 33:2 (#0) }]!",
+      "link": "GitHub Link to be added.",
+      "alleviation": "Some alleviation steps here."
+    }
+  ]
+}

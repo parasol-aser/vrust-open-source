@@ -1,0 +1,52 @@
+anchor_version = "0.24.2"
+solana_version = "1.9.16"
+
+[features]
+seeds = true
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "localnet"
+wallet = "tests/fixture-key.json"
+
+[scripts]
+test = "yarn mocha"
+
+[test.validator]
+url = "https://api.mainnet-beta.solana.com"
+
+[[test.validator.clone]]
+address = "CRATwLpu6YZEeiVq9ajjxs61wPQ9f29s1UoQR9siJCRs"
+
+[[test.validator.clone]]
+address = "SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ"
+
+[[test.validator.clone]]
+address = "ARoWLTBWoWrKMvxEiaE2EH9DrWyV7mLpKywGDWxBGeq9"
+
+[[test.validator.clone]]
+address = "SPQR4kT3q2oUKEJes2L6NNSBCiPW9SfuhkuqC9bp6Sx"
+
+[[test.validator.clone]]
+address = "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB"
+
+[[test.validator.clone]]
+address = "QMWoBmAyJLAsA1Lh9ugMTw2gciTihncciphzdNzdZYV"
+
+[programs.mainnet]
+brrr = "BRRRot6ig147TBU6EGp7TMesmQrwu729CbG6qu2ZUHWm"
+bankman = "BANKhiCgEYd7QmcWwPLkqvTuuLN6qEwXDZgTe6HEbwv1"
+
+[programs.devnet]
+brrr = "BRRRot6ig147TBU6EGp7TMesmQrwu729CbG6qu2ZUHWm"
+bankman = "BANKhiCgEYd7QmcWwPLkqvTuuLN6qEwXDZgTe6HEbwv1"
+
+[programs.testnet]
+brrr = "BRRRot6ig147TBU6EGp7TMesmQrwu729CbG6qu2ZUHWm"
+bankman = "BANKhiCgEYd7QmcWwPLkqvTuuLN6qEwXDZgTe6HEbwv1"
+
+[programs.localnet]
+brrr = "BRRRot6ig147TBU6EGp7TMesmQrwu729CbG6qu2ZUHWm"
+bankman = "BANKhiCgEYd7QmcWwPLkqvTuuLN6qEwXDZgTe6HEbwv1"

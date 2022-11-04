@@ -1,0 +1,12 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "bridge",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1644854346",
+  "int_cnt": 0,
+  "chk_cnt": 0,
+  "typ_cnt": 0,
+  "oth_cnt": 0,
+  "errors": []
+}

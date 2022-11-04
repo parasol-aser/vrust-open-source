@@ -1,0 +1,73 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "bridge",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1644816956",
+  "int_cnt": 0,
+  "chk_cnt": 4,
+  "typ_cnt": 0,
+  "oth_cnt": 0,
+  "errors": [
+    {
+      "type": "MissingCheckerCve",
+      "id": "CHK_CVE_0",
+      "title": "wormhole",
+      "category": "Missing instruction_acc.key check",
+      "severity": "Critical",
+      "location": "program/src/api/verify_signature.rs",
+      "code": "program/src/api/verify_signature.rs:68:1: 223:2 \n\tpub fn verify_signatures(\n    ctx: &ExecutionContext,\n    accs: &mut VerifySignatures,\n    data: VerifySignaturesData,\n) -> Result<()> {\n    // if *accs.instruction_acc.key != solana_program::sysvar::instructions::id() {\n    //     return Err(SolitaireError::InvalidSysvar(*accs.instruction_acc.key));\n    // }\n\n    accs.guardian_set\n        .verify_derivation(ctx.program_id, &(&*accs).into())?;\n\n    let sig_infos: Vec<SigInfo> = data\n        .signers\n        .iter()\n        .enumerate()\n        .filter_map(|(i, p)| {\n            if *p == -1 {\n                return None;\n            }\n\n            return Some(SigInfo {\n                sig_index: *p as u8,\n                signer_index: i as u8,\n            });\n        })\n        .collect();\n\n    let current_instruction = solana_program::sysvar::instructions::load_current_index(\n        &accs.instruction_acc.try_borrow_mut_data()?,\n    );\n    if current_instruction == 0 {\n        return Err(InstructionAtWrongIndex.into());\n    }\n\n    // The previous ix must be a secp verification instruction\n    let secp_ix_index = (current_instruction - 1) as u8;\n    let secp_ix = solana_program::sysvar::instructions::load_instruction_at(\n        secp_ix_index as usize,\n        &accs.instruction_acc.try_borrow_mut_data()?,\n    )\n    .map_err(|_| ProgramError::InvalidAccountData)?;\n\n    // Check that the instruction is actually for the secp program\n    if secp_ix.program_id != solana_program::secp256k1_program::id() {\n        return Err(InvalidSecpInstruction.into());\n    }\n\n    let secp_data_len = secp_ix.data.len();\n    if secp_data_len < 2 {\n        return Err(InvalidSecpInstruction.into());\n    }\n\n    let sig_len = secp_ix.data[0];\n    let mut index = 1;\n\n    let mut secp_ixs: Vec<SecpInstructionPart> = Vec::with_capacity(sig_len as usize);\n    for i in 0..sig_len {\n        let _sig_offset = byteorder::LE::read_u16(&secp_ix.data[index..index + 2]) as usize;\n        index += 2;\n        let sig_ix = secp_ix.data[index];\n        index += 1;\n        let address_offset = byteorder::LE::read_u16(&secp_ix.data[index..index + 2]) as usize;\n        index += 2;\n        let address_ix = secp_ix.data[index];\n        index += 1;\n        let msg_offset = byteorder::LE::read_u16(&secp_ix.data[index..index + 2]);\n        index += 2;\n        let msg_size = byteorder::LE::read_u16(&secp_ix.data[index..index + 2]);\n        index += 2;\n        let msg_ix = secp_ix.data[index];\n        index += 1;\n\n        if address_ix != secp_ix_index || msg_ix != secp_ix_index || sig_ix != secp_ix_index {\n            return Err(InvalidSecpInstruction.into());\n        }\n\n        let address: &[u8] = &secp_ix.data[address_offset..address_offset + 20];\n\n        // Make sure that all messages are equal\n        if i > 0 {\n            if msg_offset != secp_ixs[0].msg_offset || msg_size != secp_ixs[0].msg_size {\n                return Err(InvalidSecpInstruction.into());\n            }\n        }\n        secp_ixs.push(SecpInstructionPart {\n            address,\n            msg_offset,\n            msg_size,\n        });\n    }\n\n    if sig_infos.len() != secp_ixs.len() {\n        return Err(ProgramError::InvalidArgument.into());\n    }\n\n    // Data must be a hash\n    if secp_ixs[0].msg_size != 32 {\n        return Err(ProgramError::InvalidArgument.into());\n    }\n\n    // Extract message which is encoded in Solana Secp256k1 instruction data.\n    let message = &secp_ix.data\n        [secp_ixs[0].msg_offset as usize..(secp_ixs[0].msg_offset + secp_ixs[0].msg_size) as usize];\n\n    // Hash the message part, which contains the serialized VAA body.\n    let mut msg_hash: [u8; 32] = [0u8; 32];\n    msg_hash.copy_from_slice(message);\n\n    if !accs.signature_set.is_initialized() {\n        accs.signature_set.signatures = vec![false; accs.guardian_set.keys.len()];\n        accs.signature_set.guardian_set_index = accs.guardian_set.index;\n        accs.signature_set.hash = msg_hash;\n\n        let size = accs.signature_set.size();\n        let ix = solana_program::system_instruction::create_account(\n            accs.payer.key,\n            accs.signature_set.info().key,\n            Exempt.amount(size),\n            size as u64,\n            ctx.program_id,\n        );\n        solana_program::program::invoke(&ix, ctx.accounts)?;\n    } else {\n        // If the account already existed, check that the parameters match\n        if accs.signature_set.guardian_set_index != accs.guardian_set.index {\n            return Err(GuardianSetMismatch.into());\n        }\n\n        if accs.signature_set.hash != msg_hash {\n            return Err(InvalidHash.into());\n        }\n    }\n\n    // Write sigs of checked addresses into sig_state\n    for s in sig_infos {\n        if s.signer_index > accs.guardian_set.num_guardians() {\n            return Err(ProgramError::InvalidArgument.into());\n        }\n\n        if s.sig_index + 1 > sig_len {\n            return Err(ProgramError::InvalidArgument.into());\n        }\n\n        let key = accs.guardian_set.keys[s.signer_index as usize];\n        // Check key in ix\n        if key != secp_ixs[s.sig_index as usize].address {\n            return Err(ProgramError::InvalidArgument.into());\n        }\n\n        // Overwritten content should be zeros except double signs by the signer or harmless replays\n        accs.signature_set.signatures[s.signer_index as usize] = true;\n    }\n\n    Ok(())\n}",
+      "callstack": "api::verify_signature::verify_signatures",
+      "variable": "",
+      "status": "UnResolved",
+      "description": "Missing instruction_acc.key check for the variable that can be aribtrary as a function argument.",
+      "link": "https://github.com/certusone/wormhole/commit/e8b91810a9bb35c3c139f86b4d0795432d647305",
+      "alleviation": "Suggestion: Add a instruction_acc.key == solana_program::sysvar::instructions::id() check."
+    },
+    {
+      "type": "MissingCheckerCve",
+      "id": "CHK_CVE_1",
+      "title": "wormhole",
+      "category": "Missing instruction_acc.key check",
+      "severity": "Critical",
+      "location": "/home/ubuntu/VRust/vrust/wormhole/solana/solitaire/program/src/macros.rs",
+      "code": "/home/ubuntu/VRust/vrust/wormhole/solana/solitaire/program/src/macros.rs:68:21: 74:22 \n\tpub fn execute<'a, 'b: 'a, 'c>(p: &Pubkey, a: &'c [AccountInfo<'b>], d: &[u8]) -> Result<()> {\n                        let ix_data: $kind = BorshDeserialize::try_from_slice(d).map_err(|e| SolitaireError::InstructionDeserializeFailed(e))?;\n                        let mut accounts = FromAccounts::from(p, &mut a.iter(), &())?;\n                        $fn(&ExecutionContext{program_id: p, accounts: a}, &mut accounts, ix_data)?;\n                        Persist::persist(&accounts, p)?;\n                        Ok(())\n                    }",
+      "callstack": "instruction::VerifySignatures::execute",
+      "variable": "",
+      "status": "UnResolved",
+      "description": "Missing instruction_acc.key check for the variable that can be aribtrary as a function argument.",
+      "link": "https://github.com/certusone/wormhole/commit/e8b91810a9bb35c3c139f86b4d0795432d647305",
+      "alleviation": "Suggestion: Add a instruction_acc.key == solana_program::sysvar::instructions::id() check."
+    },
+    {
+      "type": "MissingCheckerCve",
+      "id": "CHK_CVE_2",
+      "title": "wormhole",
+      "category": "Missing instruction_acc.key check",
+      "severity": "Critical",
+      "location": "/home/ubuntu/VRust/vrust/wormhole/solana/solitaire/program/src/macros.rs",
+      "code": "/home/ubuntu/VRust/vrust/wormhole/solana/solitaire/program/src/macros.rs:89:13: 99:14 \n\tpub fn dispatch<'a, 'b: 'a, 'c>(p: &Pubkey, a: &'c [AccountInfo<'b>], d: &[u8]) -> Result<()> {\n                match d[0] {\n                    $(\n                        n if n == Instruction::$row as u8 => $row::execute(p, a, &d[1..]),\n                    )*\n\n                    other => {\n                        Err(SolitaireError::UnknownInstruction(other))\n                    }\n                }\n            }",
+      "callstack": "instruction::dispatch",
+      "variable": "",
+      "status": "UnResolved",
+      "description": "Missing instruction_acc.key check for the variable that can be aribtrary as a function argument.",
+      "link": "https://github.com/certusone/wormhole/commit/e8b91810a9bb35c3c139f86b4d0795432d647305",
+      "alleviation": "Suggestion: Add a instruction_acc.key == solana_program::sysvar::instructions::id() check."
+    },
+    {
+      "type": "MissingCheckerCve",
+      "id": "CHK_CVE_3",
+      "title": "wormhole",
+      "category": "Missing instruction_acc.key check",
+      "severity": "Critical",
+      "location": "/home/ubuntu/VRust/vrust/wormhole/solana/solitaire/program/src/macros.rs",
+      "code": "/home/ubuntu/VRust/vrust/wormhole/solana/solitaire/program/src/macros.rs:101:13: 108:14 \n\tpub fn solitaire(p: &Pubkey, a: &[AccountInfo], d: &[u8]) -> ProgramResult {\n                trace!(\"{} {} built with {}\", env!(\"CARGO_PKG_NAME\"), env!(\"CARGO_PKG_VERSION\"), solitaire::PKG_NAME_VERSION);\n                if let Err(err) = dispatch(p, a, d) {\n                    solana_program::msg!(\"Error: {:?}\", err);\n                    return Err(err.into());\n                }\n                Ok(())\n            }",
+      "callstack": "instruction::solitaire",
+      "variable": "",
+      "status": "UnResolved",
+      "description": "Missing instruction_acc.key check for the variable that can be aribtrary as a function argument.",
+      "link": "https://github.com/certusone/wormhole/commit/e8b91810a9bb35c3c139f86b4d0795432d647305",
+      "alleviation": "Suggestion: Add a instruction_acc.key == solana_program::sysvar::instructions::id() check."
+    }
+  ]
+}

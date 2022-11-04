@@ -1,0 +1,42 @@
+[package]
+name = "stable-swap-fuzz"
+version = "1.8.1"
+authors = ["michaelhly <michaelhly@gmail.com>"]
+edition = "2021"
+description = "Fuzz tests for the Saber StableSwap program."
+homepage = "https://saber.so"
+repository = "https://github.com/saber-hq/stable-swap"
+license = "Apache-2.0"
+keywords = ["solana", "saber", "fuzz"]
+
+[package.metadata]
+cargo-fuzz = true
+
+[lib]
+name = "fuzz"
+
+[dependencies]
+arbitrary = "1.1.3"
+chrono = "0.4"
+lazy_static = "1.4.0"
+libfuzzer-sys = "0.4.4"
+rand = "0.8.4"
+solana-program = "^1.9"
+spl-token = { version = "^3", features = ["no-entrypoint"] }
+stable-swap = { path = "../stable-swap-program/program", features = [
+    "fuzz",
+    "program",
+    "no-entrypoint"
+], version = "^1" }
+
+[[bin]]
+name = "fuzz_test"
+path = "targets/full.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "swaps_only_test"
+path = "targets/swaps_only.rs"
+test = false
+doc = false

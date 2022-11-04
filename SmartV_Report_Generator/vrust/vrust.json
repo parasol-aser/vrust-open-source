@@ -1,0 +1,48 @@
+{
+	"id": "hash256_value_here",
+	"user": "O2Lab VRust Team",
+	"crate": "metaplex-program-library",
+	"git-loc": "https://github.com/metaplex-foundation/metaplex-program-library",
+	"timestamp": "1642713258",
+	"errors": [{
+			"id": "INT_CVE_001",
+			"title": "Integer CVE",
+			"category": "Overflow",
+			"severity": "Medium",
+			"location": "/home/siwei/VRust/sealevel-attacks/programs/0-signer-authorization/insecure/src/lib.rs:17",
+			"callstack": "-> function referAdmin(address adm) public onlyUsers // @victim.sol::line16 \n\t require(users[msg.sender]); // @victim.sol::line9\nReach the vulnerability.\n",
+			"status": "UnResolved",
+			"description": "Integer Overflow. This bug is triggered by ...., and it is due to ....",
+			"link": "https://github.com/parasol-aser/vrust/ *** / *** / README.md",
+			"alleviation": "This bug can be fixed by the following steps: \n 1. XXX 2. XXX"
+
+		},
+		{
+			"id": "CHK_CVE_001",
+			"title": "Missing Checks",
+			"category": "Is_signer",
+			"severity": "Critical",
+			"location": "/home/siwei/VRust/sealevel-attacks/programs/0-signer-authorization/insecure/src/lib.rs:17",
+			"callstack": "-> function referAdmin(address adm) public onlyUsers // @victim.sol::line16 \n\t require(users[msg.sender]); // @victim.sol::line9\nReach the vulnerability.\n",
+			"status": "UnResolved",
+			"description": "Integer Overflow. This bug is triggered by ...., and it is due to ....",
+			"link": "https://github.com/parasol-aser/vrust/ *** / *** / README.md",
+			"alleviation": "This bug can be fixed by the following steps: \n 1. XXX 2. XXX"
+
+		},
+
+		{
+			"id": "CHK_CVE_002",
+			"title": "Missing Checks",
+			"category": "Missing Owner Check",
+			"severity": "Major",
+			"location": "/home/siwei/VRust/sealevel-attacks/programs/2-owner-checks/insecure/src/lib.rs:14",
+			"callstack": "-> function referAdmin(address adm) public onlyUsers // @victim.sol::line16 \n\t require(users[msg.sender]); // @victim.sol::line9\nReach the vulnerability.\n",
+			"status": "UnResolved",
+			"description": "Missing Owner. This bug is triggered by ...., and it is due to ....",
+			"link": "https://github.com/parasol-aser/vrust/ *** / *** / README.md",
+			"alleviation": "This bug can be fixed by the following steps: \n 1. XXX 2. XXX"
+
+		}
+	]
+}

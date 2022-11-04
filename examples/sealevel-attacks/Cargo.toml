@@ -1,0 +1,41 @@
+[workspace]
+members = [
+    "programs/0-signer-authorization/insecure",
+    "programs/1-account-data-matching/insecure",
+    "programs/2-owner-checks/insecure",
+    "programs/3-type-cosplay/insecure",
+    "programs/4-initialization/insecure",
+    "programs/5-arbitrary-cpi/insecure",
+    "programs/6-duplicate-mutable-accounts/insecure",
+    "programs/7-bump-seed-canonicalization/insecure",
+    "programs/8-pda-sharing/insecure",
+    "programs/9-closing-accounts/insecure",
+    "programs/10-sysvar-address-checking/insecure"
+]
+
+exclude = [
+    "programs/0-signer-authorization/secure",
+    "programs/1-account-data-matching/secure",
+    "programs/2-owner-checks/secure",
+    "programs/3-type-cosplay/secure",
+    "programs/4-initialization/secure",
+    "programs/5-arbitrary-cpi/secure",
+    "programs/6-duplicate-mutable-accounts/secure",
+    "programs/7-bump-seed-canonicalization/secure",
+    "programs/8-pda-sharing/secure",
+    "programs/9-closing-accounts/secure",
+    "programs/10-sysvar-address-checking/secure",
+    "programs/0-signer-authorization/recommended",
+    "programs/1-account-data-matching/recommended",
+    "programs/2-owner-checks/recommended",
+    "programs/3-type-cosplay/recommended",
+    "programs/4-initialization/recommended",
+    "programs/5-arbitrary-cpi/recommended",
+    "programs/6-duplicate-mutable-accounts/recommended",
+    "programs/7-bump-seed-canonicalization/recommended",
+    "programs/8-pda-sharing/recommended",
+    "programs/9-closing-accounts/recommended",
+    "programs/10-sysvar-address-checking/recommended",
+    "programs/9-closing-accounts/insecure-still",
+    "programs/9-closing-accounts/insecure-still-still"
+]

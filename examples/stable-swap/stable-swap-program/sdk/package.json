@@ -1,0 +1,63 @@
+{
+  "name": "@saber-hq/stableswap-tests",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saber-hq/stableswap.git"
+  },
+  "version": "1.12.3",
+  "main": "dist/index.js",
+  "bin": "bin/stableswap",
+  "license": "UNLICENSED",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "lint": "eslint . --cache",
+    "lint:ci": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix --cache",
+    "test": "jest",
+    "prettier": "prettier -w src test",
+    "test-int": "jest int.test.ts --force-exit --testTimeout=10000",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "engines": {
+    "node": ">=12.x"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.16.7",
+    "@saberhq/eslint-config": "^1.12.36",
+    "@saberhq/solana-contrib": "^1.12.36",
+    "@types/bs58": "^4.0.1",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^17.0.15",
+    "b58": "^4.0.3",
+    "eslint": "^8.8.0",
+    "jest": "^27.5.0",
+    "lint-staged": ">=12.3.3",
+    "prettier": "^2.5.1",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "@saberhq/stableswap-sdk": "^1.12.36",
+    "@saberhq/token-utils": "^1.12.36",
+    "@solana/web3.js": "^1.33.0",
+    "@types/bn.js": "^5.1.0",
+    "@types/yargs": "^17.0.8",
+    "bn.js": "^5.2.0",
+    "jsbi": "^4.1.0",
+    "yargs": "^17.3.1"
+  },
+  "lint-staged": {
+    "*.{js,css,ts,tsx}": "prettier --write",
+    "../**/*.{md,yml,yaml}": "prettier --write"
+  },
+  "resolutions": {
+    "@solana/buffer-layout": "^4"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "src/"
+  ]
+}
