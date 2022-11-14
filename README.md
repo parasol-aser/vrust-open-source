@@ -56,3 +56,9 @@ Finally run xargo again:
 ```
 RUST_LOG=debug RUSTFLAGS="-Zalways-encode-mir -Zsymbol-mangling-version=v0 -C panic=abort" xargo build -v
 ```
+
+## Research Paper
+
+For more information, please refer to our [VRust Paper](https://dl.acm.org/doi/abs/10.1145/3548606.3560552) accepted [CCS'2022](https://www.sigsac.org/ccs/CCS2022/).
+
+
