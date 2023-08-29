@@ -20,10 +20,10 @@ args = parser.parse_args()
 
 PROGRAMS_LIST = args.programs
 
-CONVERTER_LOC = args.converter
-REPORTS_LOC = args.reports
-VRUST_BUILD_LOC = args.vrust
-CWD_SOURCE_LOC = args.source
+CONVERTER_LOC = os.path.abspath(args.converter)
+REPORTS_LOC = os.path.abspath(args.reports)
+VRUST_BUILD_LOC = os.path.abspath(args.vrust)
+CWD_SOURCE_LOC = os.path.abspath(args.source)
 
 XARGO_BUILD_CMD = 'RUSTFLAGS="-Zalways-encode-mir -Zsymbol-mangling-version=v0 -C panic=abort" \
                 xargo build'
@@ -216,18 +216,20 @@ def cleanup(programData, originalXargo, originalConfig):
     '''
     XargoFile = programData.path + '/Xargo.toml'
     configFile = programData.path + '/.cargo/config.toml'
-    reportFile = programData.path + '/report.json'
+    # reportFile = programData.path + '/report.json'
 
-    fd = open(XargoFile, 'w')
-    toml.dump(originalXargo, fd)
-    fd.close()
+    if os.path.isfile(XargoFile):
+        fd = open(XargoFile, 'w')
+        toml.dump(originalXargo, fd)
+        fd.close()
 
-    fd = open(configFile, 'w')
-    toml.dump(originalConfig, fd)
-    fd.close()
+    if os.path.isfile(configFile):
+        fd = open(configFile, 'w')
+        toml.dump(originalConfig, fd)
+        fd.close()
 
-    if os.path.exists(reportFile):
-        os.remove(reportFile)
+    # if os.path.exists(reportFile):
+    #     os.remove(reportFile)
 
 def build_vrust():
     cwd = os.getcwd()
