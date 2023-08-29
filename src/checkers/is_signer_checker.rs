@@ -12,7 +12,7 @@ use rustc_middle::{
         traversal::reverse_postorder, Body, Operand, Place, PlaceRef, Rvalue, SourceInfo,
         Statement, StatementKind, Terminator, TerminatorKind,
     },
-    ty::{Ty, TyCtxt, TyKind, TyS},
+    ty::{Ty, TyCtxt, TyKind},
 };
 
 use crate::dd::{self, DataDepsGraph, ASSERT_MACRO_FILTER};

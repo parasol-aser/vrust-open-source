@@ -21,7 +21,7 @@ use rustc_middle::{
         traversal::reverse_postorder, BasicBlock, BinOp, Body, Local, Operand, Place, PlaceRef,
         Rvalue, SourceInfo, Statement, StatementKind, Terminator, TerminatorKind, ProjectionElem,
     },
-    ty::{subst::GenericArgKind, Instance, ParamEnv, Ty, TyCtxt, TyKind, TyS, relate::TypeRelation},
+    ty::{subst::GenericArgKind, Instance, ParamEnv, Ty, TyCtxt, TyKind, relate::TypeRelation},
 };
 
 use crate::{
@@ -489,7 +489,7 @@ impl<'tcx, T: StateTransitor<'tcx>> WholeProgramTraverser<'tcx, T> {
 
             let mut rest_args = Vec::new();
             let closure_arg = args.pop().unwrap();
-            let closure_args_ty: Vec<Ty<'tcx>> = closure_arg.ty(body, self.tcx).tuple_fields().collect();
+            let closure_args_ty: Vec<Ty<'tcx>> = closure_arg.ty(body, self.tcx).tuple_fields().iter().collect();
             let closure_args_cnt = callee_body.arg_count - args.len();
             let closure_arg_place = closure_arg.place().unwrap();
             for i in 0..closure_args_cnt {

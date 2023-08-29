@@ -116,7 +116,7 @@ fn parse_field_names<'tcx>(
                     res.push((
                         peels_deref(base),
                         ty_str,
-                        all_fields[field.index()].ident.name,
+                        all_fields[field.index()].name,
                     ));
                 }
             }

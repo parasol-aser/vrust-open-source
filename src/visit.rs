@@ -13,7 +13,7 @@ use rustc_middle::{
     },
     ty::{AdtDef, FieldDef, TyCtxt, TyKind},
 };
-use rustc_span::{symbol::SymbolStr, Symbol};
+use rustc_span::Symbol;
 
 pub trait DefUseChainTrait<'tcx> {
     fn get_def(
@@ -68,13 +68,13 @@ fn get_all_fields<'tcx>(
     }
     field_indices
         .iter()
-        .map(|idx| all_fields[idx.index()].ident.name)
+        .map(|idx| all_fields[idx.index()].name)
         .collect()
 }
 
 /// Check if the symbol is from assert_eq, either
 /// "left_val" or "right_val".
-fn is_from_assert_eq_macro(var: SymbolStr) -> bool {
+fn is_from_assert_eq_macro(var: &str) -> bool {
     if var == "left_val" || var == "right_val" {
         return true;
     }
@@ -112,7 +112,9 @@ where
                 // TODO: "left_val"
                 let src_var_idx = dbg_info.get(&base_place).unwrap();
                 let src_var = &body.var_debug_info[*src_var_idx];
-                if !is_from_assert_eq_macro(src_var.name.as_str()) {
+                let src_var_name = src_var.name;
+                // TODO: Erfan
+                if !is_from_assert_eq_macro(src_var_name.as_str()) {
                     let fields = get_all_fields(adt_def, place.projection);
                     return Some(Either::Left((src_var.name, fields)));
                 }

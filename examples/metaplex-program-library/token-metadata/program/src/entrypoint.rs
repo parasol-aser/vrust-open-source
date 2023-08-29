@@ -1,6 +1,6 @@
 //! Program entrypoint definitions
 
-#![cfg(all(target_arch = "bpf", not(feature = "no-entrypoint")))]
+// #![cfg(all(target_arch = "bpf", not(feature = "no-entrypoint")))]
 
 use crate::{error::MetadataError, processor};
 use solana_program::{

@@ -47,7 +47,7 @@ pub fn get_accounts<'tcx>(tcx: TyCtxt<'tcx>, body: &Body<'tcx>) -> Vec<CtxWrappe
                         } else {
                             None
                         };
-                        fields.push((field_ty, field.ident, data_ty));
+                        fields.push((field_ty, field.ident(tcx), data_ty));
                     }
                     accounts.push(
                         CtxWrappedAccounts {

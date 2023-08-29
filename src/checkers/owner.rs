@@ -90,7 +90,7 @@ fn get_all_fields<'tcx>(
     }
     field_indices
         .iter()
-        .map(|idx| all_fields[idx.index()].ident.name)
+        .map(|idx| all_fields[idx.index()].name)
         .collect()
 }
 
@@ -106,7 +106,7 @@ fn parse_field_names<'tcx>(
                 if let Some(adt_def) = ty.ty_adt_def() {
                     let ty_str = tcx.def_path_str(adt_def.did);
                     let all_fields: Vec<&FieldDef> = adt_def.all_fields().collect();
-                    res.push((base, ty_str, all_fields[field.index()].ident.name));
+                    res.push((base, ty_str, all_fields[field.index()].name));
                 }
             }
             _ => {}
@@ -395,10 +395,11 @@ fn get_try_account_trait<'tcx>(tcx: TyCtxt<'tcx>) -> Option<DefId> {
     static INIT: Once = Once::new();
     static mut ACCOUNTS_TRAIT_ID: Option<DefId> = None;
     INIT.call_once(|| {
-        for trait_id in tcx.all_traits(()) {
-            if tcx.def_path_str(*trait_id) == ACCOUNTS_TRAIT {
+        for trait_id in tcx.all_traits() {
+            // TODO: Erfan
+            if tcx.def_path_str(trait_id) == ACCOUNTS_TRAIT {
                 unsafe {
-                    ACCOUNTS_TRAIT_ID = Some(*trait_id);
+                    ACCOUNTS_TRAIT_ID = Some(trait_id);
                 }
             }
         }
