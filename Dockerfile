@@ -3,7 +3,8 @@ FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Chicago
 RUN apt-get update \
-    && apt-get install -y build-essential curl pandoc librsvg2-bin software-properties-common git \
+    && apt-get install -y build-essential curl pandoc texlive-xetex librsvg2-bin texlive-science texlive \
+        texlive-fonts-recommended texlive-fonts-extra texlive-full software-properties-common git \
     && add-apt-repository ppa:deadsnakes/ppa \
     && apt-get install -y python3.9 python3-pip python3.9-distutils
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y \
@@ -32,7 +33,7 @@ COPY . .
 
 # WORKDIR /vrust/mirav
 # RUN cargo clean \
-    # && cargo build
+#     && cargo build
 # WORKDIR /vrust
 
 # ENTRYPOINT ["python3.9", "/vrust/examples/run.py", "-v", "/vrust/target/debug/vrust", "-o", "./SmartV_Report_Generator/"]
