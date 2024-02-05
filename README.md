@@ -1,5 +1,7 @@
 # VRust
-Automated Vulnerability Detector for Solana Smart Contracts
+Automated Vulnerability Detection for Solana Smart Contracts
+
+VRust is an automated smart contract vulnerability detection framework for Solana. A key technical novelty is a set of static analysis rules for validating untrustful input accounts that are unique in the Solana programming model. We have developed a total of eight different vulnerability types, and VRust is able to check all of them fully automatically by translating source code into Rust MIR-based inference rules without any code annotations. VRust has been evaluated on over a hundred of Solana projects, and it has revealed 12 previously unknown vulnerabilities, including 3 critical vulnerabilities in the official Solana Programming Library confirmed by core developers.
 
 ## Build
 First, install rustup, and install a nightly version rustc:
