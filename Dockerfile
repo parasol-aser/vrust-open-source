@@ -27,11 +27,12 @@ RUN apt-get update \
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /vrust
-# COPY . .
+COPY . .
 
 # WORKDIR /vrust/mirav
 # RUN cargo clean \
 #     && cargo build
 # WORKDIR /vrust
 
-ENTRYPOINT ["python3.9", "/vrust/rwp/run.py", "-m", "/vrust/target/debug/vrust", "-o", "./SmartV_Report_Generator/"]
+ENTRYPOINT ["python3.9", "/vrust/examples/run.py", "-v", "/vrust/target/debug/vrust", "-o", "./SmartV_Report_Generator/"]
+

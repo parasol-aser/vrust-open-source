@@ -95,12 +95,14 @@ if __name__ == "__main__":
     #         exit()
 
     while not os.path.exists(dir):
-        print("Please input json:")
-        dir = input()
+        print("Please input json.")
+        # dir = input()
+        exit(0)
 
     while not os.path.exists(outputdir):
-        print("Please provide output directory :")
-        outputdir = input()
+        print("Please provide output directory.")
+        # outputdir = input()
+        exit(0)
 
     with open(dir, "r") as f:
         jsondata = f.read()
